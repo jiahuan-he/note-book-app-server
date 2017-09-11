@@ -8,5 +8,10 @@
     "start": "node index.js"
   },
   "author": "GeoffreyHe",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.4",
+    "mongodb": "^2.2.31",
+    "mongoose": "^4.11.9"
+  }
 }
