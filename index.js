@@ -1,11 +1,10 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser')
 
-mongoose.connect('mongodb://Geoffrey-He:375812db@ds151963.mlab.com:51963/note-book-app');
+mongoose.connect();
 
 const app = express();
-
-app.use(tempAllowCORS);
 const tempAllowCORS = function (req, res, next) {
 
     // Website you wish to allow to connect
@@ -25,44 +24,53 @@ const tempAllowCORS = function (req, res, next) {
     next();
 };
 
+app.use(tempAllowCORS);
+app.use(bodyParser.json());
 
 const Notebook = mongoose.model('Notebook', {
     uid: String,
-    content: {
-        title: String,
-        createDate: Date,
-        notebookId: String,
-        pages: [String]
-
-    }
+    title: String,
+    createDate: Date,
+    notebookId: String,
+    pages: [String]
 });
-
-const newNotebook = {
-  uid: "uid123",
-    content:{
-        title: "notebook-title",
-        createDate: new Date(),
-        notebookId: "123",
-        pages: ["333", "222", "111"]
-    }
-};
-
-Notebook.create(newNotebook , (err, newlyCreated)=>{
-    if(err){
-        console.log(err);
-    } else {
-        //redirect back to campgrounds page
-        console.log(newlyCreated);
-    }
-});
+//
+// const newNotebook = {
+//   uid: "uid123",
+//         title: "notebook-title",
+//         createDate: new Date(),
+//         notebookId: "123",
+//         pages: ["333", "222", "111"]
+// };
+//
+//     Notebook.create(newNotebook , (err, newlyCreated)=>{
+//         if(err){
+//             console.log(err);
+//         } else {
+//             console.log("created new notebook");
+//         }
+//     });
 
 
 app.get('/', function (req, res, next) {
     res.send('get')
 });
 
-app.post('/', function(req, res, next) {
-    res.send('post')
+app.post('/notebooks', function(req, res, next) {
+    const newNotebook = req.body;
+    Notebook.create( newNotebook, (err, newlyCreated) => {
+       if(err){
+           res.send(err);
+       }
+       else{
+           res.send({
+               title: newlyCreated.title,
+               createDate: newlyCreated.createDate,
+               notebookId: newlyCreated.notebookId,
+               pages: newlyCreated.pages,
+           });
+       }
+    })
 });
 
 
