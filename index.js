@@ -1,8 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser')
+const bodyParser = require('body-parser');
 
-mongoose.connect();
+mongoose.connect(process.env.MONGO_URL);
 
 const app = express();
 const tempAllowCORS = function (req, res, next) {
@@ -33,6 +33,15 @@ const Notebook = mongoose.model('Notebook', {
     createDate: Date,
     notebookId: String,
     pages: [String]
+});
+
+
+const Page = mongoose.model('Page', {
+    uid: String,
+    title: String,
+    createDate: Date,
+    pageId: String,
+    notebookId: String,
 });
 //
 // const newNotebook = {
@@ -72,6 +81,29 @@ app.post('/notebooks', function(req, res, next) {
        }
     })
 });
+
+
+app.post('/pages', function(req, res, next) {
+    const newPage = req.body;
+    console.log(req.body);
+    Page.create( newPage, (err, newlyCreated) => {
+        if(err){
+            res.send(err);
+        }
+        else{
+            console.log("res sent ");
+            console.log(newlyCreated);
+            res.send({
+                title: newlyCreated.title,
+                createDate: newlyCreated.createDate,
+                pageId: newlyCreated.pageId,
+                notebookId: newlyCreated.notebookId,
+            });
+        }
+    })
+});
+
+
 
 
 app.listen(3001, function() {
