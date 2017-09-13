@@ -43,6 +43,12 @@ const Page = mongoose.model('Page', {
     pageId: String,
     notebookId: String,
 });
+
+const Note = mongoose.model('Note', {
+    uid: String,
+    targetPageId: String,
+    note: Object
+});
 //
 // const newNotebook = {
 //   uid: "uid123",
@@ -65,7 +71,7 @@ app.get('/', function (req, res, next) {
     res.send('get')
 });
 
-app.post('/notebooks', function(req, res, next) {
+app.post('/notebooks', function(req, res) {
     const newNotebook = req.body;
     Notebook.create( newNotebook, (err, newlyCreated) => {
        if(err){
@@ -83,22 +89,48 @@ app.post('/notebooks', function(req, res, next) {
 });
 
 
-app.post('/pages', function(req, res, next) {
+app.post('/pages', function(req, res) {
     const newPage = req.body;
-    console.log(req.body);
     Page.create( newPage, (err, newlyCreated) => {
         if(err){
             res.send(err);
         }
         else{
-            console.log("res sent ");
-            console.log(newlyCreated);
             res.send({
                 title: newlyCreated.title,
                 createDate: newlyCreated.createDate,
                 pageId: newlyCreated.pageId,
                 notebookId: newlyCreated.notebookId,
             });
+        }
+    })
+});
+
+app.post('/notes', function (req, res) {
+    const uid = req.body.uid;
+    const targetPageId = req.body.targetPageId;
+    Note.findOne( {uid: uid, targetPageId: targetPageId}, function (err, notes) {
+        if( err ){
+            res.send(err);
+        }
+        else{
+            if(notes){
+
+            }
+            else{
+                const newNotes = req.body;
+                Note.create(newNotes, (err, newlyCreated) => {
+                   if(err){
+                       res.send(err);
+                   }
+                   else{
+                       res.send({
+                            targetPageId: newNotes.targetPageId,
+                            note: newNotes.note
+                       })
+                   }
+                });
+            }
         }
     })
 });
