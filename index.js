@@ -97,12 +97,31 @@ app.post('/pages', function(req, res) {
             res.send(err);
         }
         else{
-            res.send({
-                title: newlyCreated.title,
-                createDate: newlyCreated.createDate,
-                pageId: newlyCreated.pageId,
-                notebookId: newlyCreated.notebookId,
+
+            Notebook.findOne({uid: newPage.uid, notebookId: newPage.notebookId}, function (err, notebook){
+                if (err){
+
+                }
+                else{
+                    notebook.pages = notebook.pages.concat(newPage.pageId);
+                    notebook.save( function (err, updatedNotebook) {
+                        if( err){
+                            res.send(err)
+                        }
+                        else{
+                            res.send({
+                                updatedNotebook: updatedNotebook,
+                                title: newlyCreated.title,
+                                createDate: newlyCreated.createDate,
+                                pageId: newlyCreated.pageId,
+                                notebookId: newlyCreated.notebookId,
+                            });
+                        }
+                    });
+                }
             });
+
+
         }
     })
 });
@@ -161,6 +180,21 @@ app.get('/notebooks', function (req, res) {
     })
     
 });
+
+
+app.get('/pages', function (req, res) {
+    const uid = req.query.uid;
+    Page.find({uid: uid}, function (err, pages) {
+        if( err ){
+            res.send(err);
+        }
+        else{
+            res.send(pages);
+        }
+    })
+
+});
+
 
 
 app.listen(3001, function() {
