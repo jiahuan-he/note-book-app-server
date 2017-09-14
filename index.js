@@ -26,6 +26,7 @@ const tempAllowCORS = function (req, res, next) {
 
 app.use(tempAllowCORS);
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 const Notebook = mongoose.model('Notebook', {
     uid: String,
@@ -109,13 +110,26 @@ app.post('/pages', function(req, res) {
 app.post('/notes', function (req, res) {
     const uid = req.body.uid;
     const targetPageId = req.body.targetPageId;
-    Note.findOne( {uid: uid, targetPageId: targetPageId}, function (err, notes) {
+    Note.findOne( {uid: uid, targetPageId: targetPageId}, function (err, note) {
         if( err ){
             res.send(err);
         }
         else{
-            if(notes){
 
+            if(note){
+                const newNote = req.body.note;
+                note.note = newNote;
+                note.save( function (err, updatedNote) {
+                    if(err){
+                        res.send(err);
+                    }
+                    else{
+                        res.send({
+                            targetPageId: updatedNote.targetPageId,
+                            note: updatedNote.note
+                        })
+                    }
+                })
             }
             else{
                 const newNotes = req.body;
@@ -135,7 +149,18 @@ app.post('/notes', function (req, res) {
     })
 });
 
-
+app.get('/notebooks', function (req, res) {
+    const uid = req.query.uid;
+    Notebook.find({uid: uid}, function (err, notebooks) {
+        if( err ){
+            res.send(err);
+        }
+        else{
+            res.send(notebooks);
+        }
+    })
+    
+});
 
 
 app.listen(3001, function() {
