@@ -196,6 +196,18 @@ app.get('/pages', function (req, res) {
 });
 
 
+app.get('/notes', function (req, res) {
+    const uid = req.query.uid;
+    Note.find({uid: uid}, function (err, notes) {
+        if( err ){
+            res.send(err);
+        }
+        else{
+            res.send(notes);
+        }
+    })
+
+});
 
 app.listen(3001, function() {
   console.log('Node app is running');
