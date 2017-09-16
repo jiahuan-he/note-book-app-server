@@ -210,8 +210,9 @@ app.get('/notes', function (req, res) {
 
 app.put('/notebooks', function (req, res) {
    const uid = req.body.uid;
-   const title = req.body.title
-   Notebook.findOne({uid:uid}, function (err, notebook) {
+   const title = req.body.title;
+   const notebookId = req.body.notebookId;
+   Notebook.findOne({uid:uid, notebookId: notebookId}, function (err, notebook) {
        notebook.title = title;
        notebook.save( function (err, updatedNotebook) {
            if(err){
@@ -222,6 +223,24 @@ app.put('/notebooks', function (req, res) {
            }
        })
    })
+});
+
+
+app.put('/pages', function (req, res) {
+    const uid = req.body.uid;
+    const title = req.body.title;
+    const pageId = req.body.pageId;
+    Page.findOne({uid:uid, pageId: pageId}, function (err, page) {
+        page.title = title;
+        page.save( function (err, updatedPage) {
+            if(err){
+                res.send(err);
+            }
+            else{
+                res.send(updatedPage);
+            }
+        })
+    })
 });
 
 app.listen(3001, function() {
