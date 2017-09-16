@@ -206,7 +206,22 @@ app.get('/notes', function (req, res) {
             res.send(notes);
         }
     })
+});
 
+app.put('/notebooks', function (req, res) {
+   const uid = req.body.uid;
+   const title = req.body.title
+   Notebook.findOne({uid:uid}, function (err, notebook) {
+       notebook.title = title;
+       notebook.save( function (err, updatedNotebook) {
+           if(err){
+               res.send(err);
+           }
+           else{
+               res.send(updatedNotebook);
+           }
+       })
+   })
 });
 
 app.listen(3001, function() {
