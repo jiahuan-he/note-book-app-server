@@ -246,7 +246,6 @@ app.delete('/pages', function (req, res) {
     const uid = req.query.uid;
     const pageId = req.query.pageId;
     const notebookId = req.query.notebookId;
-    console.log(req.query);
     Page.remove({uid: uid, pageId: pageId}, function (err){
         if(err){
             res.send(err);
@@ -263,9 +262,7 @@ app.delete('/pages', function (req, res) {
                         }
                         else{
                             const index = notebook.pages.indexOf(pageId);
-                            console.log("   index: " + index);
                             notebook.pages.splice(index, 1);
-                            console.log(notebook.pages);
                             notebook.save( function (err, updatedNotebook) {
                                 if(err){
                                     res.send(err)
@@ -280,9 +277,49 @@ app.delete('/pages', function (req, res) {
             })
         }
     })
+});
+
+
+app.delete('/notebooks', function (req, res) {
+
+    const uid = req.query.uid;
+    const notebookId = req.query.notebookId;
+    let pages = [];
+    Notebook.findOne({uid: uid, notebookId: notebookId}, function (err, notebook) {
+       if(err){
+           res.send(err)
+       }
+       else{
+           pages = notebook.pages;
+           Notebook.remove({uid: uid, notebookId: notebookId}, function (err){
+               if(err){
+                   res.send(err);
+               }
+               else{
+                   Page.remove({uid: uid, notebookId: notebookId}, function (err) {
+                       if(err){
+                           res.send(err);
+                       }
+                       else{
+                           pages.forEach((targetPageId) => {
+                               Note.remove({targetPageId: targetPageId}, function (err) {
+                                   if(err){
+                                       res.send(err)
+                                   }
+                               })
+                           });
+                           res.send({notebookId: notebookId});
+                       }
+                   })
+               }
+           })
+       }
+    });
 
 
 });
+
+
 
 app.listen(3001, function() {
   console.log('Node app is running');
