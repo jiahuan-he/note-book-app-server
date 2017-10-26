@@ -14,10 +14,8 @@ const tempAllowCORS = function (req, res, next) {
     next();
 };
 
-if(process.env.ALLOW_CORS){
-    console.log("cors allowed");
-    app.use(tempAllowCORS);
-}
+console.log("cors allowed");
+app.use(tempAllowCORS);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
